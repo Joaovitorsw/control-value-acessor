@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { switchMap } from 'rxjs';
+import { map } from 'rxjs';
 import { RandomApiService } from './services/random-api.service';
 
 @Component({
@@ -8,20 +8,16 @@ import { RandomApiService } from './services/random-api.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   constructor(public randomAPI: RandomApiService) {}
 
-  form = new FormControl();
+  form = new FormControl(1);
 
-  ngOnInit(): void {
-    this.form.valueChanges
-      .pipe(
-        switchMap((value) => {
-          return this.randomAPI.getRandomData();
-        })
-      )
-      .subscribe((value) => {
-        this.form.setValue(value[0].brand, { emitEvent: false });
-      });
+  getRandomData() {
+    return this.randomAPI.getRandomData().pipe(
+      map((response) => {
+        return response[0].brand;
+      })
+    );
   }
 }

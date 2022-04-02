@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import {
   ControlValueAccessor,
   FormControl,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
+import { Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'app-input',
@@ -17,27 +18,36 @@ import {
     },
   ],
 })
-export class InputComponent implements OnInit, ControlValueAccessor {
-  inputForm = new FormControl();
+export class InputComponent implements ControlValueAccessor {
+  @Input() callback: (value: string) => Observable<any>;
   onChange: (value: any) => void;
   onTouch: (value: any) => void;
+  inputForm = new FormControl();
   value: string;
+  result: string;
 
-  constructor() {}
   writeValue(obj: any): void {
+    console.log(obj);
     this.value = obj;
   }
   registerOnChange(fn: any): void {
+    console.log(fn);
+
     this.onChange = fn;
   }
   registerOnTouched(fn: any): void {
+    console.log(fn);
+
     this.onTouch = fn;
   }
 
-  ngOnInit(): void {}
-
   submitForm() {
-    this.onChange(this.inputForm.value);
-    this.onTouch(this.inputForm.value);
+    this.callback(this.inputForm.value)
+      .pipe(
+        tap((response) => {
+          this.result = response;
+        })
+      )
+      .subscribe(this.writeValue);
   }
 }

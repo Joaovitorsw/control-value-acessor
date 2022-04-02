@@ -1,1 +1,4 @@
-<app-input [formControl]="form"></app-input>
+<app-input
+  [callback]="getRandomData.bind(this)"
+  [formControl]="form"
+></app-input>
